@@ -1,0 +1,94 @@
+﻿@using GridMvc.Html
+@model NewsModel
+@{
+    ViewBag.Title = "Alert";
+    ViewBag.Header = "Alert for Weaver app";
+    ViewBag.OptionalDescription = "All Alert for app";
+}
+
+<div class="card card-lime">
+    <div class="card-header">
+        <h3 class="card-title">Alert List</h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+        <!-- /.card-tools -->
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <div class="col-sm-5 text-right">
+            <button type="button" class="btn btn-secondary btn-block btn-flat btn-primary additem" onclick="addNewValue('Alerts')">Add Alert</button>
+        </div>
+        @Html.Grid(Model.Reports).Columns(columns =>
+   {
+       columns.Add().Encoded(false)
+      .Sanitized(false)
+      .SetWidth(80)
+      .RenderValueAs(o => string.Format("<img src='{1}/UploadFiles/RepotItem/{0}' height='50px' width='80px'", o.Images.FirstOrDefault(), TempData["WebsiteName"]));
+       columns.Add(c => c.Title).Titled("Title").Filterable(false);
+       columns.Add(c => c.CreatedOn).Titled("Date").Filterable(false);
+       columns.Add(c => c.Range).Titled("Range").Filterable(false);
+       columns.Add().Encoded(false)
+       .Sanitized(false)
+       .SetWidth(30)
+       .RenderValueAs(o => Html.ActionLink("Delete", "Delete", "Alert", new { id = o.Id }));
+       columns.Add()
+       .Encoded(false)
+       .Sanitized(false)
+       .SetWidth(30)
+       .RenderValueAs(o => "<a href='#' onclick='UpdateRule(this)' id=" + o.Id + " description=" + o.ShortDescription + ">Update</a>");
+
+   }).WithPaging(5).Sortable(true)
+    </div>
+</div>
+
+<div class="modal fade" id="addItem" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add</h4>
+                <button type="button" onclick="ClearInput()" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            @using (Html.BeginForm("Save", "Alert", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="text" id="newsTitle" required name="newsTitle" class="form-control" placeholder="Enter Title">
+                        <input type="text" id="newsDescription" required name="newsDescription" class="form-control" placeholder="Enter Description">
+                        <input type="text" id="newsUrl" required name="newsUrl" class="form-control" placeholder="Enter URL">
+                        @Html.TextBox("file", "Upload Image", new { type = "file" })
+                        <select id="newsRange" name="newsRange">
+                            <option value="Local">Local</option>
+                            <option value="State">State</option>
+                            <option value="National">National</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" onclick="ClearInput()" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary bntSave">Save</button>
+                </div>
+            }
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<script>
+    function ClearInput() {
+        $("#codevalue").val('');
+        $("#codetype").val('');
+    }
+    function addNewValue(val) {
+        $('#codetype').val(val);
+        $('.modal-title').html('Add New ' + val);
+        $('#codevaluelabel').html(val);
+        $('#addItem').modal('show');
+    }
+</script>
+
